@@ -1,0 +1,11 @@
+streamlit>=1.35.0
+pandas
+openpyxl
+xlsxwriter
+selenium
+webdriver-manager
+pdfplumber
+easyocr
+reportlab
+plotly
+requests
