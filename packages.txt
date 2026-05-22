@@ -1,5 +1,5 @@
-chromium-chromedriver
+chromium-driver
 chromium
 zlib1g-dev
 libjpeg-dev
-libgl1-mesa-glx
+libgl1
