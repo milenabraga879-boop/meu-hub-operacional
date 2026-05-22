@@ -1,0 +1,12 @@
+[
+  {
+    "id": "USI001",
+    "nome": "UFV 7 - NAFISAH CONSTRUTORA",
+    "potencia_kwp": 150.0,
+    "concessionaria": "ENEL CE",
+    "estado": "CE",
+    "ativa": true,
+    "data_ultimo_rateio": "2026-01-15",
+    "grupo": "B"
+  }
+]
