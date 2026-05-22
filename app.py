@@ -42,10 +42,10 @@ def clean_uc(val):
     return s
 
 # ─────────────────────────────────────────────────────────────────────────────
-# DESIGN SYSTEM — REPLICANDO gerador.sunne.com.br
+# DESIGN SYSTEM — REPLICANDO gerador.sunne.com.br (CONSERTO DE PARSING)
 # ─────────────────────────────────────────────────────────────────────────────
 def inject_css():
-    st.markdown("""
+    st.html("""
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ══════════════════════════════════════════════════════
@@ -585,11 +585,11 @@ footer    { visibility: hidden; }
 .pbar-wrap { background: #e5e7eb; border-radius: 99px; overflow: hidden; height: 6px; margin-top: 6px; }
 .pbar-fill  { height: 100%; border-radius: 99px; transition: width 0.3s; }
 </style>
-""", unsafe_allow_html=True)
+""")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# SVG ICONS (substitui todos os emojis)
+# SVG ICONS
 # ─────────────────────────────────────────────────────────────────────────────
 ICONS = {
     "dashboard":  '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
@@ -652,8 +652,7 @@ USERS = {
 
 def page_login():
     inject_css()
-    # Extra CSS específico do login
-    st.markdown("""
+    st.html("""
     <style>
     [data-testid="stAppViewContainer"] { background: #f3f4f6 !important; }
     .login-wrap {
@@ -663,7 +662,7 @@ def page_login():
         box-shadow: 0 4px 24px rgba(0,0,0,0.08);
     }
     </style>
-    """, unsafe_allow_html=True)
+    """)
 
     col1, col2, col3 = st.columns([1, 1.1, 1])
     with col2:
@@ -841,7 +840,6 @@ def render_sidebar():
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
-                # Botão real oculto (hack Streamlit)
                 if st.button(label, key=f"nav_{label}", use_container_width=True):
                     st.session_state.page = label
                     st.rerun()
@@ -936,7 +934,6 @@ def page_dashboard():
         else:
             for t in agenda[:6]:
                 ov = is_overdue(t)
-                bdr = "#fecaca" if ov else "#e5e7eb"
                 st.markdown(f"""
                 <div class="s-card-sm" style="border-left:3px solid {'#dc2626' if ov else '#F36E21'}; margin-bottom:8px;">
                     <div style="font-size:13px; font-weight:600; color:#111827; margin-bottom:5px;">{t['titulo'][:55]}</div>
@@ -964,7 +961,7 @@ def page_dashboard():
         fig.add_trace(go.Bar(x=df_h["label"], y=df_h["recebimento_liquido"],
                              name="Recebido", marker_color="#F36E21", opacity=0.85))
         fig.update_layout(
-            barmode="group", plot_bgcolor="white", paper_bgcolor="white",
+            barmode="group", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
             font=dict(family="Inter", size=12, color="#374151"),
             height=280, margin=dict(l=10, r=10, t=10, b=30),
             legend=dict(orientation="h", yanchor="bottom", y=1.02, x=0),
@@ -1047,7 +1044,7 @@ def page_gestao_equipe():
         fig.add_trace(go.Bar(name=cat, x=df["Analista"], y=df[cat],
                              marker_color=cor, text=df[cat], textposition="auto",
                              textfont=dict(size=11)))
-    fig.update_layout(barmode="group", plot_bgcolor="white", paper_bgcolor="white",
+    fig.update_layout(barmode="group", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
                       font=dict(family="Inter",size=12), height=340,
                       margin=dict(l=10,r=10,t=20,b=10),
                       legend=dict(orientation="h",yanchor="bottom",y=1.02),
@@ -1061,11 +1058,6 @@ def page_gestao_equipe():
 # ─────────────────────────────────────────────────────────────────────────────
 # PAGE: KANBAN
 # ─────────────────────────────────────────────────────────────────────────────
-KANBAN_STATUS = ["em aberto","em andamento","travado","concluido","cancelado"]
-KANBAN_LABELS = {"em aberto":"Em Aberto","em andamento":"Em Andamento",
-                 "travado":"Travado","concluido":"Concluído","cancelado":"Cancelado"}
-TEMA_COLORS  = {"Faturamento":("#fff7ed","#c2410c"),"Rateio":("#faf5ff","#7c3aed"),"Captura":("#f0fdf4","#15803d")}
-
 def page_atividades():
     page_header("Atividades", "Esteira operacional mensal — gerencie e monitore o fluxo de trabalho")
 
@@ -1073,7 +1065,6 @@ def page_atividades():
     usinas = load_json("usinas")
     analistas_list = list(USERS.keys())
 
-    # Filtros
     c1,c2,c3,c4 = st.columns([1,1,1,1])
     with c1: tema_filtro = st.selectbox("Macro-tema", ["Todos","Faturamento","Rateio","Captura"])
     with c2: analista_filtro = st.selectbox("Analista", ["Todos"]+analistas_list)
@@ -1107,13 +1098,11 @@ def page_atividades():
                     st.session_state.show_new_task = False
                     st.rerun()
 
-    # Filtrar
     filtered = [t for t in tasks
                 if (tema_filtro=="Todos" or t.get("macro_tema")==tema_filtro)
                 and (analista_filtro=="Todos" or t.get("analista")==analista_filtro)
                 and (semana_filtro=="Todas" or str(t.get("semana",""))==semana_filtro)]
 
-    # Modal trava governança
     if st.session_state.get("trava_task_id"):
         st.markdown('<div class="s-alert red"><strong>Trava de Governança —</strong> Justificativa obrigatória para continuar.</div>', unsafe_allow_html=True)
         motivo = st.text_area("Motivo do Travamento / Cancelamento (mín. 10 caracteres):", key="motivo_trava")
@@ -1135,7 +1124,6 @@ def page_atividades():
                 st.session_state.trava_task_id=None; st.rerun()
         st.markdown("---")
 
-    # Board
     cols = st.columns(5)
     for i, status in enumerate(KANBAN_STATUS):
         with cols[i]:
@@ -1190,7 +1178,7 @@ def page_atividades():
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# PAGE: CONCILIAÇÃO
+# PAGE: CONCILIÇÃO
 # ─────────────────────────────────────────────────────────────────────────────
 def page_conciliacao():
     page_header("Conciliação de Medição", "Semana 1 · Cruzamento Extrato Detalhado vs Medição Sunne — Regra Fatura Unificada")
@@ -1302,7 +1290,6 @@ def page_bi():
     total_liq = df_hist["recebimento_liquido"].sum()
     total_ded = total_bruto - total_liq
 
-    # KPI row — estilo Balanço Energético do portal
     c1,c2,c3,c4 = st.columns(4)
     with c1: st.markdown(kpi_card("Energia Injetada", f"{total_ger:,.0f}", "kWh no período", icon_name="flash", icon_bg="#fff7ed", icon_color="#F36E21"), unsafe_allow_html=True)
     with c2: st.markdown(kpi_card("Recebimento Bruto", f"R$ {total_bruto:,.0f}", "acumulado", icon_name="chart", icon_bg="#f0fdf4", icon_color="#16a34a"), unsafe_allow_html=True)
@@ -1311,7 +1298,6 @@ def page_bi():
 
     st.markdown('<div style="height:16px;"></div>', unsafe_allow_html=True)
 
-    # Gráfico combinado — barras + linha (idêntico ao portal)
     fig = go.Figure()
     fig.add_trace(go.Bar(name="Geração Injetada (kWh)", x=df_hist["mes_label"], y=df_hist["geracao_kwh"],
                          marker_color="#F36E21", opacity=0.8, yaxis="y",
@@ -1322,7 +1308,7 @@ def page_bi():
                              hovertemplate="%{x}: R$ %{y:,.2f}<extra></extra>"))
     fig.update_layout(
         title=dict(text=f"Desempenho Anual — {usina_sel}", font=dict(size=15,family="Inter",color="#111827")),
-        plot_bgcolor="white", paper_bgcolor="white",
+        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
         font=dict(family="Inter",size=12,color="#374151"),
         height=380, margin=dict(l=10,r=10,t=50,b=20),
         yaxis=dict(title="Geração (kWh)", titlefont=dict(color="#F36E21",size=12),
@@ -1333,13 +1319,11 @@ def page_bi():
     )
     st.plotly_chart(fig, use_container_width=True, config={"displayModeBar":False})
 
-    # Tabela detalhada — header laranja como no portal
     st.markdown('<div class="section-label">Detalhamento Mensal</div>', unsafe_allow_html=True)
     df_show = df_hist[["mes_label","geracao_kwh","recebimento_bruto","taxa_admin","taxa_sunne","tarifa_bancaria","recebimento_liquido"]].copy()
     df_show.columns = ["Mês","Geração (kWh)","Bruto (R$)","Taxa Admin","Taxa Sunne","Tarifa Banco","Líquido (R$)"]
     st.dataframe(df_show, use_container_width=True, hide_index=True)
 
-    # Export PDF
     if export_click:
         try:
             from reportlab.lib.pagesizes import A4
@@ -1410,7 +1394,6 @@ def page_faturas_ugs():
                 bdr = "#bbf7d0" if emitida else "#fde68a"
                 bg  = "#f0fdf4" if emitida else "#fffbeb"
                 status_txt = "Emitida" if emitida else "Pendente"
-                status_clr = "#15803d" if emitida else "#92400e"
                 st.markdown(f"""
                 <div class="s-card-sm" style="background:{bg};border:1px solid {bdr};">
                     <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -1581,7 +1564,7 @@ def page_simulador():
                 if g["usina_id"]==usina_id and g["id"] in cotas_novas:
                     g["cota_percent"] = cotas_novas[g["id"]]
             save_json("geradores",geradores)
-            st.success("Cotas atualizadas.")
+            st.success("Cotas updated.")
             st.rerun()
 
 
@@ -1838,7 +1821,6 @@ def page_captura_rpa():
             txt.markdown('<div class="s-alert green"><div>' + ICONS["check"].replace('stroke="currentColor"','stroke="#16a34a"') + '</div><div style="margin-left:8px;">Captura RPA concluída com sucesso.</div></div>', unsafe_allow_html=True)
             prog.empty()
 
-            # Log simulado
             st.markdown(f"""
             <div class="log-box">
                 <div class="inf">[{datetime.now().strftime('%H:%M:%S')}] Iniciando captura em {len(usinas_sel)} usinas...</div>
