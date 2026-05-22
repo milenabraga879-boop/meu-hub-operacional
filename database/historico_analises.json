@@ -1,0 +1,12 @@
+[
+  {
+    "usina_id": "USI001",
+    "mes_ref": "2026-04-01",
+    "geracao_kwh": 18500,
+    "recebimento_bruto": 15137.0,
+    "taxa_admin": 1059.59,
+    "taxa_sunne": 3027.4,
+    "tarifa_bancaria": 25.0,
+    "recebimento_liquido": 11025.01
+  }
+]
