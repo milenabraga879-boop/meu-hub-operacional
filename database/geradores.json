@@ -1,0 +1,10 @@
+[
+  {
+    "id": "GER001",
+    "nome": "Nafisah Investimentos Solar",
+    "cpf_cnpj": "40.103.829/0001-34",
+    "usina_id": "USI001",
+    "cota_percent": 100.0,
+    "ativo": true
+  }
+]
